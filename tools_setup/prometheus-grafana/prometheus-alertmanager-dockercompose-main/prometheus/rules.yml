@@ -1,0 +1,18 @@
+groups:
+- name: InstanceFull
+  rules:
+  # Alert for any cluster that has average CPU idle < 50%
+  - alert: HighUsage
+    expr: avg(irate(node_cpu_seconds_total{mode="idle"}[1m]) * 100) < 20
+    for: 1m
+    annotations:
+      summary: "High usage on {{ $labels.instance }}"
+      description: "{{ $labels.instance }} has a average CPU idle (current value: {{ $value }}s)"
+- name: containers
+  rules:
+  - alert: nginx_down
+    expr: absent(container_memory_usage_bytes{name="nginx-container"})
+    for: 30s
+    annotations:
+      summary: "Nginx down"
+      description: "Nginx container is down for more than 30 seconds."
